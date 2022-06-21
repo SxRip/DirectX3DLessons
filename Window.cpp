@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <sstream>
 
 //Window::WindowClass Window::WindowClass::wndClass;
 
@@ -66,7 +67,7 @@ LRESULT CALLBACK Window::HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 
 		SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
 
-		SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::HandleMsgThunk));
+		SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(Window::HandleMsgThunk));
 		return pWnd->HandleMsg(hwnd, msg, wParam, lParam);
 	}
 
@@ -95,4 +96,55 @@ LRESULT CALLBACK Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+Window::Exception::Exception(const int line, const char* file, HRESULT hr) noexcept
+	: CustomException(line, file),
+	_hr{hr}
+{
+
+}
+
+const char* Window::Exception::what() const noexcept
+{
+	std::stringstream ss;
+
+	ss << GetType() << std::endl
+		<< "[ERROR CODE] " << GetErrorCode() << std::endl
+		<< "[DESCRIPTION] " << GetErrorString() << std::endl
+		<< _GetOriginalStr();
+
+	whatBuff = ss.str();
+
+	return whatBuff.c_str();
+}
+
+const char* Window::Exception::GetType() const noexcept
+{
+	return "Window exception";
+}
+
+std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
+{
+	char* pMsgBuf = nullptr;
+	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
+		| FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr);
+
+	if (!nMsgLen)
+		return "Undentifided error code";
+
+	std::string errorStr = pMsgBuf;
+	LocalFree(pMsgBuf);
+	return errorStr;
+}
+
+HRESULT Window::Exception::GetErrorCode() const noexcept
+{
+	return _hr;
+}
+
+std::string Window::Exception::GetErrorString() const noexcept
+{
+	return TranslateErrorCode(_hr);
 }
