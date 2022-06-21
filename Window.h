@@ -28,7 +28,7 @@ public:
 		const char* what() const noexcept override;
 		virtual const char* GetType() const noexcept override;
 
-		static std::string TranslateErrorCode(HRESULT hr) noexcept;
+		//std::string TranslateErrorCode(HRESULT hr) noexcept;
 		HRESULT GetErrorCode() const noexcept;
 		std::string GetErrorString() const noexcept;
 
@@ -51,4 +51,5 @@ private:
 	WindowClass wndClass;
 };
 
-#define CHWND_EXCEPT(hr) Window::Exception(__LINE__,__FILE__, hr);
+#define HWND_EXCEPT(hr) Window::Exception(__LINE__, __FILE__, hr);
+#define HWND_LAST_ERROR() Window::Exception(__LINE__, __FILE__, GetLastError());

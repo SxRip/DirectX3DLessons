@@ -1,8 +1,6 @@
 #include "Window.h"
 #include <sstream>
-
-//Window::WindowClass Window::WindowClass::wndClass;
-
+#include "resource.h"
 
 Window::WindowClass::WindowClass()
 	: hInst(GetModuleHandle(nullptr)),
@@ -14,8 +12,13 @@ Window::WindowClass::WindowClass()
 	wc.lpfnWndProc = HandleMsgSetup;
 	wc.hInstance = GetInstance();
 	wc.lpszClassName = GetWndClassName();
+	wc.hIcon = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1),
+		IMAGE_ICON, 32, 32, 0));
 
-	RegisterClassEx(&wc);
+	wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1),
+		IMAGE_ICON, 16, 16, 0));
+
+		RegisterClassEx(&wc);
 }
 
 const char* Window::WindowClass::GetWndClassName() const
@@ -43,11 +46,15 @@ Window::Window(int width, int height, const char* WindowName)
 	rc.top = 100;
 	rc.bottom = height + rc.top;
 
-	AdjustWindowRect(&rc, WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, 0);
+	if (!AdjustWindowRect(&rc, WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, 0))
+		throw HWND_LAST_ERROR();
 
 	hwnd = CreateWindow(wndClass.GetWndClassName(), WindowName, WS_CAPTION
 		| WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left,
 		rc.bottom - rc.top, nullptr, nullptr, wndClass.GetInstance(), this);
+
+	if (hwnd == nullptr)
+		throw HWND_LAST_ERROR();
 
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 }
@@ -100,7 +107,7 @@ LRESULT CALLBACK Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
 Window::Exception::Exception(const int line, const char* file, HRESULT hr) noexcept
 	: CustomException(line, file),
-	_hr{hr}
+	_hr{ hr }
 {
 
 }
@@ -124,20 +131,20 @@ const char* Window::Exception::GetType() const noexcept
 	return "Window exception";
 }
 
-std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
-{
-	char* pMsgBuf = nullptr;
-	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
-		| FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr);
-
-	if (!nMsgLen)
-		return "Undentifided error code";
-
-	std::string errorStr = pMsgBuf;
-	LocalFree(pMsgBuf);
-	return errorStr;
-}
+//std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
+//{
+//	char* pMsgBuf = nullptr;
+//	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
+//		| FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+//		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr);
+//
+//	if (!nMsgLen)
+//		return "Undentifided error code";
+//
+//	std::string errorStr = pMsgBuf;
+//	LocalFree(pMsgBuf);
+//	return errorStr;
+//}
 
 HRESULT Window::Exception::GetErrorCode() const noexcept
 {
@@ -146,5 +153,16 @@ HRESULT Window::Exception::GetErrorCode() const noexcept
 
 std::string Window::Exception::GetErrorString() const noexcept
 {
-	return TranslateErrorCode(_hr);
+	/*return TranslateErrorCode(_hr);*/
+	char* pMsgBuf = nullptr;
+	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
+		| FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, _hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr);
+
+	if (!nMsgLen)
+		return "Undentifided error code";
+
+	std::string errorStr = pMsgBuf;
+	LocalFree(pMsgBuf);
+	return errorStr;
 }
