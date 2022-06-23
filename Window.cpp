@@ -19,7 +19,7 @@ Window::WindowClass::WindowClass()
 	wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1),
 		IMAGE_ICON, 16, 16, 0));
 
-		RegisterClassEx(&wc);
+	RegisterClassEx(&wc);
 }
 
 const char* Window::WindowClass::GetWndClassName() const
@@ -104,7 +104,10 @@ LRESULT CALLBACK Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 	case WM_KEYDOWN:
 		if (wParam == 'F')
 			SetWindowText(hwnd, "Respected");
-		keybd.KeyOnPressed(static_cast<unsigned char>(wParam));
+
+		if (!(lParam & 0x40000000) || keybd.AutorepeatIsEnable())
+			keybd.KeyOnPressed(static_cast<unsigned char>(wParam));
+
 		break;
 
 	case WM_KEYUP:
