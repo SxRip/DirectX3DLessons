@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include "CustomException.h"
+#include "Keyboard.h"
 
 class Window
 {
@@ -41,11 +42,15 @@ public:
 
 	Window(const Window&) = delete;
 	Window operator=(const Window&) = delete;
+
+	Keyboard keybd;
+
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT CALLBACK HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
+private:
 	//int width, height;
 	HWND hwnd;
 	WindowClass wndClass;

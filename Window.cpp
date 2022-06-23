@@ -12,6 +12,7 @@ Window::WindowClass::WindowClass()
 	wc.lpfnWndProc = HandleMsgSetup;
 	wc.hInstance = GetInstance();
 	wc.lpszClassName = GetWndClassName();
+
 	wc.hIcon = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1),
 		IMAGE_ICON, 32, 32, 0));
 
@@ -96,10 +97,23 @@ LRESULT CALLBACK Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 		PostQuitMessage(0);
 		return 0;
 
+	case WM_KILLFOCUS:
+		keybd.ClearState();
+		break;
+
 	case WM_KEYDOWN:
 		if (wParam == 'F')
 			SetWindowText(hwnd, "Respected");
-		return 0;
+		keybd.KeyOnPressed(static_cast<unsigned char>(wParam));
+		break;
+
+	case WM_KEYUP:
+		keybd.OnKeyReleased(static_cast<unsigned char>(wParam));
+		break;
+
+	case WM_CHAR:
+		keybd.OnChar(static_cast<unsigned char>(wParam));
+		break;
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
