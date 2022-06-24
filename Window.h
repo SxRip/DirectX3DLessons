@@ -46,7 +46,8 @@ public:
 	Window operator=(const Window&) = delete;
 	void SetTitle(const std::string& title);
 
-	static std::optional<int> ProcessMessages();
+	HWND _GetHWND() const noexcept;
+	static std::optional<int> ProcessMessages() noexcept;
 
 	Keyboard keybd;
 	Mouse mouse;

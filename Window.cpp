@@ -74,7 +74,12 @@ void Window::SetTitle(const std::string& title)
 		throw HWND_LAST_ERROR();
 }
 
-std::optional<int> Window::ProcessMessages()
+HWND Window::_GetHWND() const noexcept
+{
+	return hwnd;
+}
+
+std::optional<int> Window::ProcessMessages() noexcept
 {
 	MSG msg;
 

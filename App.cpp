@@ -14,14 +14,14 @@ int App::Go()
 			return *ecode;
 
 		DoFrame();
+		Sleep(1);
 	}
 }
 
 void App::DoFrame()
 {
-	const float t = _timer.Peek();
 	std::stringstream ss;
-	ss << "Time ellapsed: " << std::setprecision(1) << std::fixed << t;
+	ss << "Time ellapsed: " << std::setprecision(1) << std::fixed << _timer.Peek();
 
-	_wnd.SetTitle(ss.str().c_str());
+	_wnd.SetTitle(ss.str());
 }
