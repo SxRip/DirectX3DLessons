@@ -46,7 +46,7 @@ public:
 	Window operator=(const Window&) = delete;
 	void SetTitle(const std::string& title);
 
-	//static std::optional<int> ProcessMessages();
+	static std::optional<int> ProcessMessages();
 
 	Keyboard keybd;
 	Mouse mouse;
