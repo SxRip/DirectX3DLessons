@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include "CustomException.h"
 #include "Keyboard.h"
+#include "Mouse.h"
 
 class Window
 {
@@ -42,8 +43,10 @@ public:
 
 	Window(const Window&) = delete;
 	Window operator=(const Window&) = delete;
+	void SetTitle(const std::string& title);
 
 	Keyboard keybd;
+	Mouse mouse;
 
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -51,7 +54,7 @@ private:
 	LRESULT CALLBACK HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 private:
-	//int width, height;
+	int width, height;
 	HWND hwnd;
 	WindowClass wndClass;
 };
