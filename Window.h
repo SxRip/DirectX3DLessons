@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include <optional>
 #include "CustomException.h"
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -44,6 +45,8 @@ public:
 	Window(const Window&) = delete;
 	Window operator=(const Window&) = delete;
 	void SetTitle(const std::string& title);
+
+	//static std::optional<int> ProcessMessages();
 
 	Keyboard keybd;
 	Mouse mouse;

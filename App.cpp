@@ -10,37 +10,28 @@ int App::Go()
 {
 	MSG msg;
 	BOOL bResult = 0;
-
+	int i = 0;
 	while ((bResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
-		//DoFrame();
+		DoFrame();
 
 		while (!_wnd.mouse.IsEmpty())
 		{
 			const Mouse::Event e = _wnd.mouse.Read();
-
 			switch (e.GetType())
 			{
-			case Mouse::Event::Type::Leave:
-				_wnd.SetTitle("Gone!");
+			case Mouse::Event::Type::WheelUp:
+				++i;
+				_wnd.SetTitle("Up: " + std::to_string(i));
 				break;
 
-			case Mouse::Event::Type::Enter:
-				_wnd.SetTitle("Entered");
+			case Mouse::Event::Type::WheelDown:
+				--i;
+				_wnd.SetTitle("Down: " + std::to_string(i));
 				break;
-
-			case Mouse::Event::Type::Move:
-				{
-					std::stringstream ss;
-
-					ss << e.GetPosX() << " " << e.GetPosY();
-
-					_wnd.SetTitle(ss.str());
-					break;
-				}
 			}
 		}
 	}

@@ -113,6 +113,6 @@ private:
 
 	const unsigned int _bufferSize = 16u;
 	bool _leftIsPressed, _rightIsPressed, _isInWindow;
-	int x, y, _wheelDeltaCarry;
+	int x, y, _wheelDeltaCarry = 0;
 };
 
