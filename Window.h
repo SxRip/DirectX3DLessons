@@ -1,9 +1,11 @@
 #pragma once
 #include <Windows.h>
 #include <optional>
+#include <memory>
 #include "CustomException.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Graphics.h"
 
 class Window
 {
@@ -44,14 +46,17 @@ public:
 
 	Window(const Window&) = delete;
 	Window operator=(const Window&) = delete;
-	void SetTitle(const std::string& title);
 
 	HWND _GetHWND() const noexcept;
-	static std::optional<int> ProcessMessages() noexcept;
+	void SetTitle(const std::string& title);
+
+	Graphics& Gfx();
+
+
+	std::optional<int> ProcessMessages() noexcept;
 
 	Keyboard keybd;
 	Mouse mouse;
-
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -61,6 +66,7 @@ private:
 	int width, height;
 	HWND hwnd;
 	WindowClass wndClass;
+	std::unique_ptr<Graphics> pGfx;
 };
 
 #define HWND_EXCEPT(hr) Window::Exception(__LINE__, __FILE__, hr);

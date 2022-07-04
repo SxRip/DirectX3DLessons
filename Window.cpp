@@ -61,6 +61,8 @@ Window::Window(int width, int height, const char* WindowName)
 		throw HWND_LAST_ERROR();
 
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
+
+	pGfx = std::make_unique<Graphics>(hwnd);
 }
 
 Window::~Window()
@@ -72,6 +74,11 @@ void Window::SetTitle(const std::string& title)
 {
 	if (!SetWindowText(hwnd, title.c_str()))
 		throw HWND_LAST_ERROR();
+}
+
+Graphics& Window::Gfx()
+{
+	return *pGfx;
 }
 
 HWND Window::_GetHWND() const noexcept
@@ -250,21 +257,6 @@ const char* Window::Exception::GetType() const noexcept
 	return "Window exception";
 }
 
-//std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
-//{
-//	char* pMsgBuf = nullptr;
-//	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
-//		| FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-//		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr);
-//
-//	if (!nMsgLen)
-//		return "Undentifided error code";
-//
-//	std::string errorStr = pMsgBuf;
-//	LocalFree(pMsgBuf);
-//	return errorStr;
-//}
-
 HRESULT Window::Exception::GetErrorCode() const noexcept
 {
 	return _hr;
@@ -272,7 +264,6 @@ HRESULT Window::Exception::GetErrorCode() const noexcept
 
 std::string Window::Exception::GetErrorString() const noexcept
 {
-	/*return TranslateErrorCode(_hr);*/
 	char* pMsgBuf = nullptr;
 	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
 		| FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, _hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
